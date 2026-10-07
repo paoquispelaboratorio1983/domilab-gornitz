@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domilab — Derivaciones Gornitz</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    header h1 {
+      font-size: 1.8rem;
+      color: #1F4E79;
+      font-weight: 700;
+    }
+    header p {
+      color: #64748b;
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }
+
+    .cards {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 860px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 28px;
+      flex: 1 1 340px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      border-top: 5px solid #1F4E79;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      color: #1F4E79;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      background: #1F4E79;
+      color: white;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .card p {
+      color: #64748b;
+      font-size: 0.88rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .file-drop {
+      border: 2px dashed #BDD7EE;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 16px;
+      background: #f8fbff;
+    }
+    .file-drop:hover { border-color: #1F4E79; background: #edf4fb; }
+    .file-drop input[type=file] { display: none; }
+    .file-drop label { cursor: pointer; color: #1F4E79; font-size: 0.9rem; font-weight: 500; }
+    .file-drop .icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+    .file-name { font-size: 0.82rem; color: #475569; margin-top: 6px; min-height: 18px; }
+
+    button[type=submit] {
+      width: 100%;
+      padding: 12px;
+      background: #1F4E79;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button[type=submit]:hover { background: #163d60; }
+    button[type=submit]:disabled { background: #94a3b8; cursor: not-allowed; }
+
+    .alerts { width: 100%; max-width: 860px; margin-bottom: 20px; }
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+    .alert-error   { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+    .alert-warning { background: #fef3c7; color: #92400e; border-left: 4px solid #f59e0b; }
+
+    footer {
+      margin-top: 48px;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🧪 Domilab — Derivaciones Gornitz</h1>
+    <p>Procesamiento automático de derivaciones al laboratorio Gornitz</p>
+  </header>
+
+  {% if get_flashed_messages() %}
+  <div class="alerts">
+    {% for category, msg in get_flashed_messages(with_categories=true) %}
+      <div class="alert alert-{{ category }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="cards">
+
+    <!-- PASO 1 -->
+    <div class="card">
+      <h2><span class="badge">1</span> Generar planilla de derivaciones</h2>
+      <p>Subí el Excel exportado desde <strong>Gano</strong>. Se descarga la planilla lista para cargar los barcodes de Gornitz.</p>
+
+      <form method="POST" action="/paso1" enctype="multipart/form-data" id="form1">
+        <div class="file-drop" onclick="document.getElementById('file1').click()">
+          <span class="icon">📂</span>
+          <input type="file" id="file1" name="archivo" accept=".xlsx,.xls"
+                 onchange="mostrarNombre(this,'nombre1')">
+          <label>Seleccionar Excel de Gano</label>
+          <div class="file-name" id="nombre1">Ningún archivo seleccionado</div>
+        </div>
+        <button type="submit" id="btn1" disabled>⬇ Descargar planilla de derivaciones</button>
+      </form>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="card">
+      <h2><span class="badge">2</span> Generar TXT para Gornitz</h2>
+      <p>Una vez cargados los <strong>barcodes</strong> en la planilla del Paso 1, subila acá para generar el TXT listo para importar en Gornitz.</p>
+
+      <form method="POST" action="/paso2" enctype="multipart/form-data" id="form2">
+        <div class="file-drop" onclick="document.getElementById('file2').click()">
+          <span class="icon">📋</span>
+          <input type="file" id="file2" name="archivo" accept=".xlsx,.xls"
+                 onchange="mostrarNombre(this,'nombre2')">
+          <label>Seleccionar planilla con barcodes</label>
+          <div class="file-name" id="nombre2">Ningún archivo seleccionado</div>
+        </div>
+        <button type="submit" id="btn2" disabled>⬇ Descargar TXT Gornitz</button>
+      </form>
+    </div>
+
+  </div>
+
+  <footer>Domilab · Salsipuedes, Córdoba</footer>
+
+  <script>
+    function mostrarNombre(input, idSpan) {
+      const span = document.getElementById(idSpan);
+      if (input.files.length > 0) {
+        span.textContent = input.files[0].name;
+        // habilitar botón correspondiente
+        const btnId = idSpan === "nombre1" ? "btn1" : "btn2";
+        document.getElementById(btnId).disabled = false;
+      } else {
+        span.textContent = "Ningún archivo seleccionado";
+      }
+    }
+  </script>
+
+</body>
+</html>
